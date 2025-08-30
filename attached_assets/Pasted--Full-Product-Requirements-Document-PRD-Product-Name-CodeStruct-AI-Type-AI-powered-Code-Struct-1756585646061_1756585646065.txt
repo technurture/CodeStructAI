@@ -1,0 +1,161 @@
+📄 Full Product Requirements Document (PRD)
+Product Name: CodeStruct AI
+Type: AI-powered Code Structuring & Commenting Extension
+Target Platforms: Visual Studio Code (initial), JetBrains IDEs, Sublime Text (future).
+
+1. Objective
+CodeStruct AI is an AI-driven coding assistant that analyzes, restructures, cleans, and comments codebases across multiple programming languages.
+
+It enables:
+
+Consistent architecture: Detects or enforces best practices.
+
+Multi-language support: Python, JavaScript/TypeScript, Java, C#, Go, PHP, C/C++, Rust (initial set).
+
+Automated documentation: Adds docstrings, inline comments, and file/module summaries.
+
+Project scalability: Helps developers maintain clean, understandable codebases.
+
+Seamless integration: Available inside VS Code and other editors.
+
+Business model: 1-month free trial → subscription plan (unlimited usage).
+
+2. Key Features
+🔍 Codebase Analysis
+Detect primary language(s) and frameworks.
+
+Identify existing architecture (MVC, layered, modular, monolithic).
+
+Spot inconsistencies, duplicate code, and dead code.
+
+🧠 AI-Powered Structuring
+Learn from existing project patterns.
+
+Suggest or apply restructuring (file/folder hierarchy).
+
+Recommend missing layers (e.g., services, controllers, models).
+
+Generate architecture if none exists (based on best practices per language).
+
+✨ Code Cleaning & Refactoring
+Format using language-specific standards (Prettier, ESLint, Black, ClangFormat, etc.).
+
+Remove unused imports, dead variables, console logs, TODOs.
+
+Improve function decomposition & naming consistency.
+
+💬 Smart Commenting & Documentation
+Auto-generate docstrings for functions/classes.
+
+Add inline comments for complex logic.
+
+Provide file/module summaries for quick understanding.
+
+Generate README.md or project-level documentation if missing.
+
+🛠 Developer Interaction
+Sidebar Panel (VS Code):
+
+Scan Project
+
+Suggest Structure
+
+Apply Fixes (with Git diff preview)
+
+Inline AI Actions: Right-click → “Explain code” / “Refactor code”.
+
+Git Integration: Pre-commit AI check for structure/format.
+
+💳 Subscription & Monetization
+Free Trial: 1 month, limited to projects under 100 files.
+
+Paid Plan (Unlimited):
+
+Unlimited project scans & restructures.
+
+Priority AI inference (faster responses).
+
+Multi-language support unlocked.
+
+Cloud-based AI model updates.
+
+Payment via Stripe/AWS Marketplace integration.
+
+3. User Stories
+As a student, I want auto-generated comments so I can learn from my code.
+
+As a developer, I want my project auto-structured and formatted so I can focus on logic.
+
+As a team lead, I want to enforce consistent architecture across my team’s codebase.
+
+As a freelancer, I want to restructure messy client projects quickly.
+
+As a CTO, I want my engineers to follow standard architecture for scalability.
+
+4. Technical Requirements
+🖥 Client-Side (VS Code Extension)
+Tech: TypeScript + VS Code Extension API.
+
+Responsibilities:
+
+Parse project tree.
+
+Detect language(s) via file extensions & config files.
+
+Send code chunks to backend AI.
+
+Display AI suggestions (diff view, comments, restructuring proposals).
+
+☁️ Backend (AWS-based AI Integration)
+Hosting: AWS Lambda + API Gateway (scalable, serverless).
+
+AI Models:
+
+AWS Bedrock (Anthropic Claude / Amazon Titan for structuring & doc generation).
+
+Optionally OpenAI API fallback.
+
+Data Processing:
+
+Chunk large files for LLM.
+
+Maintain project context (vector database: Amazon OpenSearch or Pinecone).
+
+Database: Amazon RDS / DynamoDB for:
+
+User accounts.
+
+Subscription plans & billing status.
+
+Project history & preferences.
+
+Auth: AWS Cognito (OAuth, JWT).
+
+Payment: Stripe or AWS Marketplace subscription model.
+
+🔐 Security & Privacy
+Code processing is local-first; only anonymized or user-approved snippets sent to backend.
+
+End-to-end encrypted communication.
+
+Enterprise tier: self-hosted AI backend in customer’s AWS account.
+
+5. Non-Functional Requirements
+Performance: Handle projects <200 files in under 30s.
+
+Scalability: Auto-scale AWS Lambda for large usage.
+
+Reliability: 99.9% uptime SLA for paid plans.
+
+Usability: Non-intrusive UI (suggests, doesn’t overwrite without approval).
+
+Extensibility: Support new languages via plugin modules.
+
+6. Success Metrics
+Developer Adoption: ≥ 10K downloads in first 6 months.
+
+Retention: ≥ 50% of free trial users convert to paid.
+
+Impact: Reduction of 30% in code review comments on structure/format.
+
+Engagement: Avg. 5+ project scans per week per active user.
