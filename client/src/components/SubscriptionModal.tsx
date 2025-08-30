@@ -1,7 +1,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Check, Crown, Mail } from "lucide-react";
+import { useState } from "react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface SubscriptionModalProps {
   open: boolean;
@@ -9,15 +14,51 @@ interface SubscriptionModalProps {
 }
 
 export default function SubscriptionModal({ open, onClose }: SubscriptionModalProps) {
-  const handleUpgrade = () => {
-    // Mock upgrade process
-    alert("Upgrade functionality would be implemented here with Stripe integration");
-    onClose();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleUpgrade = async () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to proceed",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await apiRequest("POST", "/api/create-payment", {
+        email,
+        amount: 29 // $29 USD
+      });
+
+      const data = await response.json();
+      
+      if (data.authorizationUrl) {
+        // Open Paystack payment page in new window
+        window.open(data.authorizationUrl, '_blank');
+        
+        toast({
+          title: "Redirecting to Payment",
+          description: "Complete your payment in the new window to upgrade to Pro",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Payment Error",
+        description: "Failed to initiate payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleContactSales = () => {
-    // Mock contact sales
-    alert("Contact sales functionality would be implemented here");
+    window.open("mailto:sales@codestruct.ai?subject=Enterprise Inquiry", '_blank');
   };
 
   return (
@@ -106,14 +147,31 @@ export default function SubscriptionModal({ open, onClose }: SubscriptionModalPr
               </li>
             </ul>
             
-            <Button
-              onClick={handleUpgrade}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              data-testid="button-upgrade-pro"
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Upgrade to Pro
-            </Button>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email-input" className="text-sm font-medium">
+                  Email Address
+                </Label>
+                <Input
+                  id="email-input"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1"
+                  data-testid="input-email"
+                />
+              </div>
+              <Button
+                onClick={handleUpgrade}
+                disabled={isLoading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                data-testid="button-upgrade-pro"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                {isLoading ? "Processing..." : "Upgrade to Pro - $29"}
+              </Button>
+            </div>
           </div>
         </div>
 

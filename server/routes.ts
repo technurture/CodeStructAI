@@ -5,8 +5,17 @@ import { analyzeCodebase, generateDocumentation, suggestCodeImprovements } from 
 import { insertUserSchema, insertProjectSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
+import paystack from "paystack";
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Initialize Paystack when needed
+function getPaystackClient() {
+  if (!process.env.PAYSTACK_SECRET_KEY) {
+    throw new Error('Missing required Paystack secret: PAYSTACK_SECRET_KEY');
+  }
+  return paystack(process.env.PAYSTACK_SECRET_KEY);
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Helper function to detect language from file extension
@@ -292,6 +301,247 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(file);
     } catch (error) {
       res.status(500).json({ message: "Failed to update file" });
+    }
+  });
+
+  // Paystack payment routes
+  app.post("/api/create-payment", async (req, res) => {
+    try {
+      const { email, amount } = req.body;
+      const paystack = getPaystackClient();
+      
+      const params = {
+        email,
+        amount: amount * 100, // Convert to kobo (Paystack's smallest unit)
+        currency: 'NGN'
+      };
+      
+      const response = await paystack.transaction.initialize(params);
+      res.json({ 
+        authorizationUrl: response.data.authorization_url,
+        reference: response.data.reference 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating payment: " + error.message });
+    }
+  });
+
+  app.post("/api/verify-payment", async (req, res) => {
+    try {
+      const { reference } = req.body;
+      const paystack = getPaystackClient();
+      
+      const response = await paystack.transaction.verify(reference);
+      
+      if (response.data.status === 'success') {
+        res.json({ status: 'success', data: response.data });
+      } else {
+        res.json({ status: 'failed', message: 'Payment verification failed' });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: "Error verifying payment: " + error.message });
+    }
+  });
+
+  // Extension authentication endpoints
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // For demo purposes - simplified authentication
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      // In production, properly hash and verify passwords
+      if (password !== 'demo123') {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          email: user.email,
+          subscriptionTier: user.subscriptionTier,
+          subscriptionExpires: user.subscriptionExpires 
+        } 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, email } = insertUserSchema.parse(req.body);
+      
+      const user = await storage.createUser({ 
+        username, 
+        email,
+        subscriptionTier: 'trial',
+        subscriptionExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days trial
+      });
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          email: user.email,
+          subscriptionTier: user.subscriptionTier,
+          subscriptionExpires: user.subscriptionExpires 
+        } 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/user/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          email: user.email,
+          subscriptionTier: user.subscriptionTier,
+          subscriptionExpires: user.subscriptionExpires 
+        } 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Extension-specific endpoints
+  app.post("/api/extension/register", async (req, res) => {
+    try {
+      // Create anonymous trial user for extension
+      const user = await storage.createUser({ 
+        username: `ext_user_${Date.now()}`,
+        email: `ext_${Date.now()}@codestruct.ai`,
+        subscriptionTier: 'trial',
+        subscriptionExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days trial
+      });
+      
+      // Return user ID as token for simplicity
+      res.json({ token: user.id });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/extension/subscription", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+      }
+      
+      const user = await storage.getUser(token);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      
+      const now = new Date();
+      const trialExpired = user.subscriptionExpires ? now > user.subscriptionExpires : true;
+      
+      res.json({
+        status: user.subscriptionTier,
+        trialExpired: trialExpired && user.subscriptionTier === 'trial',
+        subscriptionExpires: user.subscriptionExpires
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/extension/analyze", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+      }
+      
+      const user = await storage.getUser(token);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      
+      // Check subscription status
+      const now = new Date();
+      const trialExpired = user.subscriptionExpires ? now > user.subscriptionExpires : true;
+      if (trialExpired && user.subscriptionTier === 'trial') {
+        return res.status(403).json({ message: "Trial expired. Please upgrade to Pro." });
+      }
+      
+      const { files } = req.body;
+      const analysis = await analyzeCodebase(files);
+      
+      res.json(analysis);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/extension/analyze-file", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+      }
+      
+      const user = await storage.getUser(token);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      
+      const { content, fileName } = req.body;
+      const analysis = await analyzeCodebase([{ path: fileName, content, language: detectLanguage(fileName) }]);
+      
+      res.json(analysis);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/extension/generate-docs", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+      }
+      
+      const { content, fileName } = req.body;
+      const documented = await generateDocumentation(content, fileName);
+      
+      res.json({ documented });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/extension/improve", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+      }
+      
+      const { content, fileName } = req.body;
+      const improvements = await suggestCodeImprovements(content, fileName);
+      
+      res.json(improvements);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

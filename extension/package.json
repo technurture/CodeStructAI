@@ -1,0 +1,157 @@
+{
+  "name": "codestruct-ai",
+  "displayName": "CodeStruct AI",
+  "description": "AI-powered code structuring, cleaning, and documentation extension",
+  "version": "1.0.0",
+  "publisher": "codestruct",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Formatters",
+    "Linters"
+  ],
+  "keywords": [
+    "ai",
+    "code analysis",
+    "documentation",
+    "structuring",
+    "refactoring"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codestruct.analyzeProject",
+        "title": "CodeStruct: Analyze Current Project",
+        "icon": "$(search)"
+      },
+      {
+        "command": "codestruct.analyzeFile",
+        "title": "CodeStruct: Analyze Current File",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "codestruct.generateDocs",
+        "title": "CodeStruct: Generate Documentation",
+        "icon": "$(book)"
+      },
+      {
+        "command": "codestruct.improveCode",
+        "title": "CodeStruct: Suggest Improvements",
+        "icon": "$(lightbulb)"
+      },
+      {
+        "command": "codestruct.openDashboard",
+        "title": "CodeStruct: Open Dashboard",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "codestruct.upgrade",
+        "title": "CodeStruct: Upgrade to Pro",
+        "icon": "$(star)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "codestruct.analyzeFile",
+          "when": "resourceExtname =~ /\\.(js|ts|py|java|cpp|c|cs|go|php|rb|rs)$/",
+          "group": "codestruct"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "codestruct.analyzeFile",
+          "when": "resourceExtname =~ /\\.(js|ts|py|java|cpp|c|cs|go|php|rb|rs)$/",
+          "group": "codestruct"
+        },
+        {
+          "command": "codestruct.generateDocs",
+          "when": "resourceExtname =~ /\\.(js|ts|py|java|cpp|c|cs|go|php|rb|rs)$/",
+          "group": "codestruct"
+        },
+        {
+          "command": "codestruct.improveCode",
+          "when": "resourceExtname =~ /\\.(js|ts|py|java|cpp|c|cs|go|php|rb|rs)$/",
+          "group": "codestruct"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codestruct.analyzeProject"
+        },
+        {
+          "command": "codestruct.analyzeFile"
+        },
+        {
+          "command": "codestruct.generateDocs"
+        },
+        {
+          "command": "codestruct.improveCode"
+        },
+        {
+          "command": "codestruct.openDashboard"
+        },
+        {
+          "command": "codestruct.upgrade"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "codestructAnalysis",
+          "name": "CodeStruct Analysis",
+          "when": "workspaceFolderCount > 0"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codestruct",
+          "title": "CodeStruct AI",
+          "icon": "$(code)"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CodeStruct AI",
+      "properties": {
+        "codestruct.apiUrl": {
+          "type": "string",
+          "default": "https://your-app-url.replit.app",
+          "description": "CodeStruct AI service URL"
+        },
+        "codestruct.autoAnalyze": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically analyze files on save"
+        },
+        "codestruct.maxFileSize": {
+          "type": "number",
+          "default": 100000,
+          "description": "Maximum file size to analyze (bytes)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "axios": "^1.5.0"
+  }
+}
