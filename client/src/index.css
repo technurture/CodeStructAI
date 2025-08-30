@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(210 25% 7.8431%);
+  --card: hsl(180 6.6667% 97.0588%);
+  --card-foreground: hsl(210 25% 7.8431%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(210 25% 7.8431%);
+  --primary: hsl(210 100% 56%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(210 25% 7.8431%);
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(240 1.9608% 90%);
+  --muted-foreground: hsl(210 25% 7.8431%);
+  --accent: hsl(142 76% 36%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(201.4286 30.4348% 90.9804%);
+  --input: hsl(200 23.0769% 97.4510%);
+  --ring: hsl(202.8169 89.1213% 53.1373%);
+  --chart-1: hsl(203.8863 88.2845% 53.1373%);
+  --chart-2: hsl(159.7826 100% 36.0784%);
+  --chart-3: hsl(42.0290 92.8251% 56.2745%);
+  --chart-4: hsl(147.1429 78.5047% 41.9608%);
+  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --radius: 8px;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+.dark {
+  --background: hsl(220 13% 9%);
+  --foreground: hsl(220 9% 78%);
+  --card: hsl(220 13% 12%);
+  --card-foreground: hsl(220 9% 78%);
+  --popover: hsl(220 13% 9%);
+  --popover-foreground: hsl(220 9% 78%);
+  --primary: hsl(210 100% 56%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(220 13% 15%);
+  --secondary-foreground: hsl(220 9% 78%);
+  --muted: hsl(220 13% 15%);
+  --muted-foreground: hsl(220 9% 46%);
+  --accent: hsl(142 76% 36%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(220 13% 18%);
+  --input: hsl(220 13% 18%);
+  --ring: hsl(210 100% 56%);
+  --chart-1: hsl(203.8863 88.2845% 53.1373%);
+  --chart-2: hsl(159.7826 100% 36.0784%);
+  --chart-3: hsl(42.0290 92.8251% 56.2745%);
+  --chart-4: hsl(147.1429 78.5047% 41.9608%);
+  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --radius: 8px;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom styles for CodeStruct AI */
+.code-font {
+  font-family: var(--font-mono);
+}
+
+.syntax-highlight {
+  background-color: hsl(var(--card));
+  border-radius: 4px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.syntax-highlight .keyword { 
+  color: hsl(207 82% 66%); 
+}
+
+.syntax-highlight .string { 
+  color: hsl(114 31% 68%); 
+}
+
+.syntax-highlight .comment { 
+  color: hsl(101 29% 47%); 
+  font-style: italic; 
+}
+
+.syntax-highlight .function { 
+  color: hsl(39 67% 69%); 
+}
+
+.syntax-highlight .variable { 
+  color: hsl(220 14% 71%); 
+}
+
+.syntax-highlight .number { 
+  color: hsl(29 54% 61%); 
+}
+
+.tree-item {
+  transition: background-color 200ms ease;
+}
+
+.tree-item:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* Scrollbar styling */
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(220 13% 25%) transparent;
+}
+
+.scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background-color: hsl(220 13% 25%);
+  border-radius: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(220 13% 35%);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .7;
+  }
+}
+
+.analysis-badge {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Ensure proper contrast in both themes */
+.dark .bg-white {
+  @apply bg-card;
+}
+
+.dark .text-black {
+  @apply text-foreground;
+}
+
+.light .bg-black {
+  @apply bg-card;
+}
+
+.light .text-white {
+  @apply text-foreground;
+}
