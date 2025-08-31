@@ -49,6 +49,7 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
           console.log("Debug: Body set for Anthropic model:", body);
         } else if (modelId.startsWith("amazon.nova")) {
           // Nova model format - similar to modern chat format
+          console.log("Debug: Using Nova format");
           body = JSON.stringify({
             messages: messages.map(msg => ({
               role: msg.role === "user" ? "user" : "assistant",
@@ -60,6 +61,7 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
               top_p: 0.9
             }
           });
+          console.log("Debug: Body set for Nova model:", body);
         } else if (modelId.startsWith("amazon.titan")) {
           // Titan model format
           const combinedPrompt = (systemPrompt ? systemPrompt + "\n\n" : "") + prompt;
