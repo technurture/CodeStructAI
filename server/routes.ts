@@ -117,7 +117,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projectId = req.params.id;
       const files = req.files as Express.Multer.File[];
       
+      console.log("Upload request - Project ID:", projectId);
+      console.log("Upload request - Files received:", files?.length || 0);
+      console.log("Upload request - Body:", req.body);
+      console.log("Upload request - Files details:", files?.map(f => ({ name: f.originalname, size: f.size })));
+      
       if (!files || files.length === 0) {
+        console.log("Upload error: No files received");
         return res.status(400).json({ message: "No files uploaded" });
       }
 
@@ -365,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: user.username, 
           email: user.email,
           subscriptionTier: user.subscriptionTier,
-          subscriptionExpires: user.subscriptionExpires 
+          trialEndsAt: user.trialEndsAt 
         } 
       });
     } catch (error: any) {
@@ -379,9 +385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const user = await storage.createUser({ 
         username, 
-        email,
-        subscriptionTier: 'trial',
-        subscriptionExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days trial
+        email
       });
       
       res.json({ 
@@ -390,7 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: user.username, 
           email: user.email,
           subscriptionTier: user.subscriptionTier,
-          subscriptionExpires: user.subscriptionExpires 
+          trialEndsAt: user.trialEndsAt 
         } 
       });
     } catch (error: any) {
@@ -413,7 +417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: user.username, 
           email: user.email,
           subscriptionTier: user.subscriptionTier,
-          subscriptionExpires: user.subscriptionExpires 
+          trialEndsAt: user.trialEndsAt 
         } 
       });
     } catch (error: any) {
@@ -427,9 +431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create anonymous trial user for extension
       const user = await storage.createUser({ 
         username: `ext_user_${Date.now()}`,
-        email: `ext_${Date.now()}@codestruct.ai`,
-        subscriptionTier: 'trial',
-        subscriptionExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days trial
+        email: `ext_${Date.now()}@codestruct.ai`
       });
       
       // Return user ID as token for simplicity
@@ -457,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         status: user.subscriptionTier,
         trialExpired: trialExpired && user.subscriptionTier === 'trial',
-        subscriptionExpires: user.subscriptionExpires
+        trialEndsAt: user.subscriptionExpires
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
