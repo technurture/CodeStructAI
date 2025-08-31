@@ -33,12 +33,18 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
         console.log(`Trying model: ${modelId}`);
         
         let body;
-        if (modelId.startsWith("anthropic")) {
+        console.log(`Debug: Model ID: ${modelId}`);
+        console.log(`Debug: includes anthropic: ${modelId.includes("anthropic")}`);
+        console.log(`Debug: includes claude: ${modelId.includes("claude")}`);
+        
+        if (modelId.includes("anthropic") || modelId.includes("claude")) {
+          console.log("Debug: Using Anthropic format");
           body = JSON.stringify({
             anthropic_version: "bedrock-2023-05-31",
             max_tokens: 4000,
             messages: messages
           });
+          console.log("Debug: Body set for Anthropic model:", body);
         } else if (modelId.startsWith("amazon.nova")) {
           // Nova model format - similar to modern chat format
           body = JSON.stringify({
@@ -75,7 +81,7 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
         const response = await bedrock.send(command);
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
         
-        if (modelId.startsWith("anthropic")) {
+        if (modelId.includes("anthropic") || modelId.includes("claude")) {
           return responseBody.content[0].text;
         } else if (modelId.startsWith("amazon.nova")) {
           return responseBody.output.message.content[0].text;
