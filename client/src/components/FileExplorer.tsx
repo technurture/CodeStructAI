@@ -106,9 +106,18 @@ export default function FileExplorer({
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
+    console.log("File input changed:", files?.length, "files selected");
+    console.log("Project:", project?.id);
+    
     if (files && files.length > 0 && project) {
+      console.log("Starting file upload...");
       uploadFilesMutation.mutate(files);
+    } else {
+      console.log("Upload conditions not met:", { hasFiles: !!files && files.length > 0, hasProject: !!project });
     }
+    
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
   };
 
   const handleScanProject = () => {
