@@ -79,10 +79,11 @@ export default function FileExplorer({
         description: "Files uploaded successfully",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Upload error:", error);
       toast({
         title: "Error",
-        description: "Failed to upload files",
+        description: error.message || "Failed to upload files",
         variant: "destructive",
       });
     },
@@ -264,24 +265,18 @@ export default function FileExplorer({
               </Button>
             </div>
             
-            <div className="relative">
+            <div className="space-y-2">
               <input
                 type="file"
                 multiple
                 accept=".js,.jsx,.ts,.tsx,.py,.java,.cpp,.c,.cs,.go,.php,.rb,.rs,.kt,.swift,.html,.css,.scss,.sass,.json,.xml,.yml,.yaml"
                 onChange={handleFileUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                 data-testid="input-file-upload"
               />
-              <Button
-                variant="outline"
-                className="w-full"
-                disabled={uploadFilesMutation.isPending}
-                data-testid="button-upload-files"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                {uploadFilesMutation.isPending ? "Uploading..." : "Upload Files"}
-              </Button>
+              {uploadFilesMutation.isPending && (
+                <div className="text-sm text-muted-foreground">Uploading files...</div>
+              )}
             </div>
             
             {/* Project Stats */}

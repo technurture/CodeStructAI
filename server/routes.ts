@@ -121,10 +121,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Upload request - Files received:", files?.length || 0);
       console.log("Upload request - Body:", req.body);
       console.log("Upload request - Files details:", files?.map(f => ({ name: f.originalname, size: f.size })));
+      console.log("Upload request - Headers:", req.headers);
       
       if (!files || files.length === 0) {
         console.log("Upload error: No files received");
-        return res.status(400).json({ message: "No files uploaded" });
+        console.log("Request content type:", req.headers['content-type']);
+        return res.status(400).json({ message: "No files uploaded - check if files are being sent correctly" });
       }
 
       const project = await storage.getProject(projectId);
