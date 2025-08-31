@@ -25,7 +25,7 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
     // Try different supported models in order of preference
     const modelsToTry = [
       "amazon.nova-lite-v1:0",
-      "anthropic.claude-3-7-sonnet-20250109-v1:0"
+      "anthropic.claude-3-5-sonnet-20241022-v2:0"
     ];
 
     for (const modelId of modelsToTry) {
@@ -88,7 +88,23 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
       }
     }
     
-    throw new Error("All Bedrock models failed");
+    // If all Bedrock models fail, try OpenAI as fallback
+    if (process.env.OPENAI_API_KEY) {
+      console.log('Trying OpenAI as fallback...');
+      try {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: messages as any,
+          max_tokens: 4000,
+          temperature: 0.1,
+        });
+        return completion.choices[0]?.message?.content || "";
+      } catch (openaiError) {
+        console.log('OpenAI fallback failed:', (openaiError as Error).message);
+      }
+    }
+    
+    throw new Error("All Bedrock models and OpenAI fallback failed");
   } catch (error) {
     console.error('AWS Bedrock error:', error);
     throw new Error('Failed to invoke AWS Bedrock: ' + (error as Error).message);
