@@ -23,8 +23,11 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
     ];
 
     // Try different supported models in order of preference  
-    // Note: Newer Claude models require inference profiles, not direct model IDs
+    // Based on user having access to "Nova Lite" and "Claude 3.7 Sonnet"
     const modelsToTry = [
+      "amazon.nova-lite-v1:0",                         // Nova Lite (confirmed access)
+      "us.anthropic.claude-3-7-sonnet-20250219-v1:0", // Claude 3.7 Sonnet (inference profile)
+      "anthropic.claude-3-7-sonnet-20250219-v1:0",    // Claude 3.7 Sonnet (direct model)
       "us.anthropic.claude-3-5-sonnet-20241022-v2:0", // Claude 3.5 Sonnet v2 (inference profile)
       "anthropic.claude-3-sonnet-20240229-v1:0",      // Claude 3 Sonnet (direct model)
       "anthropic.claude-3-haiku-20240307-v1:0"        // Claude 3 Haiku (direct model)
@@ -32,12 +35,12 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
 
     for (const modelId of modelsToTry) {
       try {
-        console.log(`Trying model: ${modelId}`);
+        console.log(`\n=== TRYING MODEL: ${modelId} ===`);
         
         let body;
-        console.log(`Debug: Model ID: ${modelId}`);
         console.log(`Debug: includes anthropic: ${modelId.includes("anthropic")}`);
         console.log(`Debug: includes claude: ${modelId.includes("claude")}`);
+        console.log(`Debug: startsWith amazon.nova: ${modelId.startsWith("amazon.nova")}`);
         
         if (modelId.includes("anthropic") || modelId.includes("claude")) {
           console.log("Debug: Using Anthropic format");
