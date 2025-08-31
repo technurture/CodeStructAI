@@ -25,9 +25,10 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
     // Try different supported models in order of preference
     const modelsToTry = [
       "amazon.nova-lite-v1:0",
-      "anthropic.claude-3-7-sonnet-20250109-v1:0",
-      "amazon.nova-micro-v1:0",
-      "amazon.nova-pro-v1:0"
+      "amazon.nova-micro-v1:0", 
+      "amazon.titan-text-express-v1",
+      "anthropic.claude-3-haiku-20240307-v1:0",
+      "anthropic.claude-instant-v1"
     ];
 
     for (const modelId of modelsToTry) {
