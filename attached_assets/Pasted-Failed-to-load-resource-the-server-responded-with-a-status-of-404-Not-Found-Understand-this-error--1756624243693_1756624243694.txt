@@ -1,0 +1,46 @@
+Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+489ddf7e-ff8e-49f9-aff6-7bba4bb33fda-00-2omn4icxpnexc.kirk.replit.dev/api/files/undefined:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+489ddf7e-ff8e-49f9-aff6-7bba4bb33fda-00-2omn4icxpnexc.kirk.replit.dev/api/files/undefined:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Apply changes mutation called
+Console.js:61 Data received: Object
+Console.js:61 File ID: undefined
+Console.js:61 Full file object: super-admin-routes.ts
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Files query result: Array(1)
+Console.js:61 Typed files: Array(1)
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+Console.js:61 Apply changes mutation called
+Console.js:61 Data received: {type: 'Maintainability', title: 'Error handling standardization', description: 'Create a centralized error handling middleware to ensure consistent error responses', file: 'super-admin-routes.ts'}
+Console.js:61 File ID: undefined
+Console.js:61 Full file object: super-admin-routes.ts
+Console.js:61 Files query result: [{…}]
+Console.js:61 Typed files: [{…}]
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6
+Console.js:61 Files query result: [{…}]
+Console.js:61 Typed files: [{…}]
+Console.js:61 Project ID: d4c1c4a3-f690-4982-9466-1146695986a6

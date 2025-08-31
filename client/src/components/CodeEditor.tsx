@@ -219,23 +219,8 @@ export default function CodeEditor({ selectedFile, onDiffGenerated }: CodeEditor
             </Button>
           </div>
 
-          {/* Mock suggestions for demo */}
-          <div className="mt-4 space-y-2">
-            <div className="bg-primary/10 border border-primary/20 p-3 rounded-md">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-primary">Add Error Handling</span>
-                <Button
-                  size="sm"
-                  className="text-xs bg-primary text-primary-foreground hover:bg-primary/90"
-                  data-testid="button-apply-error-handling"
-                >
-                  Apply
-                </Button>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Wrap API calls in try-catch blocks and add user-friendly error messages
-              </div>
-            </div>
+          <div className="mt-4 text-xs text-muted-foreground">
+            Click "Generate Documentation" or "Suggest Improvements" above to get AI-powered suggestions that you can apply to your code.
           </div>
         </div>
       </div>

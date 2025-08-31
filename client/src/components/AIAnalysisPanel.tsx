@@ -151,14 +151,9 @@ export default function AIAnalysisPanel({ project, onSuggestionApply }: AIAnalys
                       <div className="text-xs text-muted-foreground mb-3">
                         {suggestion.description}
                       </div>
-                      <Button
-                        size="sm"
-                        className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-                        onClick={() => onSuggestionApply(suggestion)}
-                        data-testid={`button-apply-suggestion-${index}`}
-                      >
-                        Apply Suggestion
-                      </Button>
+                      <div className="bg-muted/30 p-2 rounded text-xs text-center text-muted-foreground">
+                        💡 Analysis suggestion - Use "Generate Documentation" or "Suggest Improvements" for actionable changes
+                      </div>
                     </div>
                   ))}
                 </div>
