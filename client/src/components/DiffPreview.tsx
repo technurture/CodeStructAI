@@ -19,6 +19,15 @@ export default function DiffPreview({ data, onApplyChanges, onRejectChanges }: D
 
   const applyChangesMutation = useMutation({
     mutationFn: async (content: string) => {
+      console.log('Apply changes mutation called');
+      console.log('Data received:', data);
+      console.log('File ID:', data.file?.id);
+      console.log('Full file object:', data.file);
+      
+      if (!data.file?.id) {
+        throw new Error('No file ID available for applying changes');
+      }
+      
       const response = await apiRequest("PATCH", `/api/files/${data.file.id}`, { content });
       return response.json();
     },

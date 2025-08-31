@@ -269,7 +269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         language: file.language || 'text'
       }]);
       
-      res.json({
+      const response = {
         original: file.content,
         documented,
         changes: [
@@ -283,7 +283,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           path: file.path,
           language: file.language
         }
-      });
+      };
+      
+      console.log('Documentation endpoint response:', JSON.stringify(response, null, 2));
+      console.log('File object:', file);
+      console.log('File ID:', file.id);
+      
+      res.json(response);
     } catch (error) {
       console.error("Documentation error:", error);
       res.status(500).json({ message: "Failed to generate documentation: " + (error as Error).message });
@@ -304,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         language: file.language || 'text'
       }]);
       
-      res.json({
+      const response = {
         original: file.content,
         improved: improvements,
         changes: [
@@ -318,7 +324,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           path: file.path,
           language: file.language
         }
-      });
+      };
+      
+      console.log('Improvement endpoint response:', JSON.stringify(response, null, 2));
+      console.log('File object:', file);
+      console.log('File ID:', file.id);
+      
+      res.json(response);
     } catch (error) {
       console.error("Improvement error:", error);
       res.status(500).json({ message: "Failed to suggest improvements: " + (error as Error).message });

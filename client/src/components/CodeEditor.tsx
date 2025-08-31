@@ -30,6 +30,10 @@ export default function CodeEditor({ selectedFile, onDiffGenerated }: CodeEditor
       return response.json();
     },
     onSuccess: (data) => {
+      console.log('Documentation mutation success, data received:', data);
+      console.log('File data:', data.file);
+      console.log('File ID:', data.file?.id);
+      
       onDiffGenerated({
         type: "documentation",
         original: data.original,
@@ -57,6 +61,10 @@ export default function CodeEditor({ selectedFile, onDiffGenerated }: CodeEditor
       return response.json();
     },
     onSuccess: (data) => {
+      console.log('Improvement mutation success, data received:', data);
+      console.log('File data:', data.file);
+      console.log('File ID:', data.file?.id);
+      
       onDiffGenerated({
         type: "improvement",
         original: data.original,
