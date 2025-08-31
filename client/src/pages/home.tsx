@@ -49,7 +49,8 @@ export default function Home() {
         <AIAnalysisPanel
           project={currentProject}
           onSuggestionApply={(suggestion) => {
-            setDiffData(suggestion);
+            // Analysis suggestions are informational only
+            console.log('Analysis suggestion clicked (informational only):', suggestion);
           }}
           data-testid="ai-analysis-panel"
         />

@@ -25,6 +25,7 @@ export default function DiffPreview({ data, onApplyChanges, onRejectChanges }: D
       console.log('Full file object:', data.file);
       
       if (!data.file?.id) {
+        alert('❌ Invalid suggestion data. Please use the "Generate Documentation" or "Suggest Improvements" buttons in the center panel instead of clicking analysis suggestions.');
         throw new Error('No file ID available for applying changes');
       }
       
