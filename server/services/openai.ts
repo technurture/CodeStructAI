@@ -23,7 +23,7 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
     ];
 
     // Try different supported models in order of preference  
-    // Based on user having access to "Nova Lite" and "Claude 3.7 Sonnet"
+    // PRIORITY: Nova Lite first (user confirmed access)
     const modelsToTry = [
       "amazon.nova-lite-v1:0",                         // Nova Lite (confirmed access)
       "us.anthropic.claude-3-7-sonnet-20250219-v1:0", // Claude 3.7 Sonnet (inference profile)
@@ -76,6 +76,15 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
               topP: 0.9
             }
           });
+        } else {
+          console.log(`ERROR: Unknown model format for ${modelId} - no request body created`);
+          continue;
+        }
+        
+        console.log(`Debug: Request body length: ${body?.length || 0} characters`);
+        if (!body) {
+          console.log(`ERROR: No body created for model ${modelId}`);
+          continue;
         }
 
         const command = new InvokeModelCommand({
@@ -111,7 +120,7 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
           max_tokens: 4000,
           temperature: 0.1,
         });
-        return completion.choices[0]?.message?.content || "";
+        return completion.choices[0].message.content || "No response from OpenAI";
       } catch (openaiError) {
         console.log('OpenAI fallback failed:', (openaiError as Error).message);
       }
@@ -119,39 +128,22 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
     
     throw new Error("All Bedrock models and OpenAI fallback failed");
   } catch (error) {
-    console.error('AWS Bedrock error:', error);
-    throw new Error('Failed to invoke AWS Bedrock: ' + (error as Error).message);
+    console.error("AWS Bedrock error:", error);
+    throw new Error(`Failed to invoke AWS Bedrock: ${(error as Error).message}`);
   }
 }
 
-export interface CodeAnalysisResult {
-  detectedLanguages: Record<string, number>;
-  architecture: string;
-  issues: Array<{
-    type: string;
-    severity: "high" | "medium" | "low";
-    file: string;
-    description: string;
-    line?: number;
-  }>;
-  suggestions: Array<{
-    type: string;
-    title: string;
-    description: string;
-    file?: string;
-    changes?: string;
-  }>;
-}
-
-export async function analyzeCodebase(files: Array<{ path: string; content: string; language?: string }>): Promise<CodeAnalysisResult> {
+// Function to analyze codebase using AI
+export async function analyzeCodebase(files: Array<{ path: string; content: string; language: string }>): Promise<any> {
   try {
-    const fileList = files.map(f => `${f.path} (${f.language || 'unknown'})`).join('\n');
-    const sampleContent = files.slice(0, 5).map(f => `// ${f.path}\n${f.content.slice(0, 1000)}`).join('\n\n');
-
+    // Prepare the prompt with file information
+    const filesList = files.map(f => `${f.path} (${f.language})`).join('\n');
+    const sampleContent = files.map(f => `// ${f.path}\n${f.content.substring(0, 2000)}`).join('\n\n');
+    
     const prompt = `Analyze this codebase and provide a comprehensive analysis. 
 
 Files in project:
-${fileList}
+${filesList}
 
 Sample content from key files:
 ${sampleContent}
@@ -188,80 +180,116 @@ Focus on:
 5. Best practices violations`;
 
     const systemPrompt = "You are an expert code analyst. Analyze codebases and provide structured feedback on architecture, issues, and improvements. Always respond with valid JSON.";
-    const result = await invokeAI(prompt, systemPrompt);
-    return JSON.parse(result) as CodeAnalysisResult;
-  } catch (error) {
-    console.error('AWS Bedrock analysis error:', error);
-    throw new Error('Failed to analyze codebase: ' + (error as Error).message);
-  }
-}
-
-export async function generateDocumentation(code: string, filename: string): Promise<string> {
-  try {
-    const prompt = `Generate comprehensive documentation for this code file.
-
-Filename: ${filename}
-Code:
-${code}
-
-Add:
-1. JSDoc/docstring comments for functions and classes
-2. Inline comments for complex logic
-3. File header description
-4. Parameter and return type documentation
-
-Return only the enhanced code with documentation added.`;
-
-    const systemPrompt = "You are a documentation expert. Add comprehensive documentation to code files while preserving all original functionality.";
-    const result = await invokeAI(prompt, systemPrompt);
-    return result || code;
-  } catch (error) {
-    console.error('Documentation generation error:', error);
-    throw new Error('Failed to generate documentation: ' + (error as Error).message);
-  }
-}
-
-export async function suggestCodeImprovements(code: string, filename: string): Promise<{
-  improved: string;
-  changes: Array<{
-    type: "addition" | "modification" | "removal";
-    description: string;
-    lineStart?: number;
-    lineEnd?: number;
-  }>;
-}> {
-  try {
-    const prompt = `Improve this code by fixing issues, adding error handling, and following best practices.
-
-Filename: ${filename}
-Code:
-${code}
-
-Return JSON with this structure:
-{
-  "improved": "the improved code",
-  "changes": [
-    {
-      "type": "addition|modification|removal",
-      "description": "what was changed",
-      "lineStart": number_optional,
-      "lineEnd": number_optional
+    
+    const response = await invokeAI(prompt, systemPrompt);
+    
+    try {
+      return JSON.parse(response);
+    } catch (parseError) {
+      console.error("Failed to parse AI response as JSON:", response);
+      // Return a fallback structure
+      return {
+        detectedLanguages: { "unknown": 100 },
+        architecture: "Unable to analyze - parsing error",
+        issues: [],
+        suggestions: []
+      };
     }
-  ]
+  } catch (error) {
+    console.error("AWS Bedrock analysis error:", error);
+    throw new Error(`Failed to analyze codebase: ${(error as Error).message}`);
+  }
 }
+
+// Function to generate documentation for code
+export async function generateDocumentation(files: Array<{ path: string; content: string; language: string }>): Promise<string> {
+  try {
+    const filesList = files.map(f => `${f.path} (${f.language})`).join('\n');
+    const sampleContent = files.map(f => `// ${f.path}\n${f.content.substring(0, 1500)}`).join('\n\n');
+    
+    const prompt = `Generate comprehensive documentation for this codebase:
+
+Files in project:
+${filesList}
+
+Code content:
+${sampleContent}
+
+Please provide:
+1. Project overview and purpose
+2. Architecture description
+3. Key components and their responsibilities
+4. API endpoints and usage
+5. Setup and installation instructions
+6. Usage examples
+
+Format as clear, well-structured documentation.`;
+
+    const systemPrompt = "You are a technical documentation expert. Create clear, comprehensive documentation that helps developers understand and use the codebase effectively.";
+    
+    return await invokeAI(prompt, systemPrompt);
+  } catch (error) {
+    console.error("Documentation generation error:", error);
+    throw new Error(`Failed to generate documentation: ${(error as Error).message}`);
+  }
+}
+
+// Function to suggest code improvements
+export async function suggestCodeImprovements(files: Array<{ path: string; content: string; language: string }>): Promise<string> {
+  try {
+    const filesList = files.map(f => `${f.path} (${f.language})`).join('\n');
+    const sampleContent = files.map(f => `// ${f.path}\n${f.content.substring(0, 1500)}`).join('\n\n');
+    
+    const prompt = `Analyze this codebase and suggest specific improvements:
+
+Files in project:
+${filesList}
+
+Code content:
+${sampleContent}
+
+Please provide:
+1. Code quality improvements
+2. Performance optimizations
+3. Security enhancements
+4. Architecture suggestions
+5. Best practices recommendations
+6. Refactoring opportunities
+
+Focus on practical, actionable suggestions with examples.`;
+
+    const systemPrompt = "You are a senior code architect. Provide expert recommendations to improve code quality, performance, and maintainability.";
+    
+    return await invokeAI(prompt, systemPrompt);
+  } catch (error) {
+    console.error("Code improvement suggestions error:", error);
+    throw new Error(`Failed to get code improvement suggestions: ${(error as Error).message}`);
+  }
+}
+
+// Function to get AI-powered suggestions for code improvements
+export async function getCodeSuggestions(code: string, language: string): Promise<string> {
+  try {
+    const prompt = `Please review this ${language} code and provide specific improvement suggestions:
+
+\`\`\`${language}
+${code}
+\`\`\`
 
 Focus on:
-1. Error handling
-2. Type safety
-3. Performance improvements
-4. Code clarity
-5. Best practices`;
+1. Code quality and best practices
+2. Performance optimizations
+3. Security considerations
+4. Maintainability improvements
+5. Language-specific conventions
 
-    const systemPrompt = "You are a code improvement expert. Enhance code quality while maintaining functionality. Always respond with valid JSON.";
-    const result = await invokeAI(prompt, systemPrompt);
-    return JSON.parse(result);
+Provide practical, actionable suggestions.`;
+
+    const systemPrompt = "You are an expert code reviewer. Provide constructive, specific feedback to improve code quality, performance, and maintainability.";
+    
+    return await invokeAI(prompt, systemPrompt);
   } catch (error) {
-    console.error('Code improvement error:', error);
-    throw new Error('Failed to suggest improvements: ' + (error as Error).message);
+    console.error("Code suggestions error:", error);
+    throw new Error(`Failed to get code suggestions: ${(error as Error).message}`);
   }
 }
