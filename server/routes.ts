@@ -7,7 +7,13 @@ import multer from "multer";
 import path from "path";
 import paystack from "paystack";
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+    files: 50 // max 50 files
+  }
+});
 
 // Initialize Paystack when needed
 function getPaystackClient() {

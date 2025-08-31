@@ -63,10 +63,18 @@ export default function FileExplorer({
 
   const uploadFilesMutation = useMutation({
     mutationFn: async (files: FileList) => {
+      console.log("Creating FormData with files:", Array.from(files).map(f => f.name));
       const formData = new FormData();
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file, index) => {
+        console.log(`Appending file ${index}: ${file.name} (${file.size} bytes)`);
         formData.append("files", file);
       });
+      
+      // Log FormData contents
+      console.log("FormData entries:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
       
       const response = await apiUpload("POST", `/api/projects/${project.id}/upload`, formData);
       return response.json();
