@@ -63,9 +63,15 @@ export default function FileExplorer({
 
   const uploadFilesMutation = useMutation({
     mutationFn: async (files: FileList) => {
-      console.log("Creating FormData with files:", Array.from(files).map(f => f.name));
+      console.log("Mutation received files:", files);
+      console.log("Files length:", files.length);
+      console.log("Files type:", typeof files);
+      
+      const filesArray = Array.from(files);
+      console.log("Creating FormData with files:", filesArray.map(f => f.name));
+      
       const formData = new FormData();
-      Array.from(files).forEach((file, index) => {
+      filesArray.forEach((file, index) => {
         console.log(`Appending file ${index}: ${file.name} (${file.size} bytes)`);
         formData.append("files", file);
       });
@@ -121,17 +127,20 @@ export default function FileExplorer({
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     console.log("File input changed:", files?.length, "files selected");
+    console.log("Files object:", files);
+    console.log("Files as array:", files ? Array.from(files) : "null");
     console.log("Project:", project?.id);
     
     if (files && files.length > 0 && project) {
       console.log("Starting file upload...");
+      console.log("Files being passed to mutation:", files);
       uploadFilesMutation.mutate(files);
     } else {
       console.log("Upload conditions not met:", { hasFiles: !!files && files.length > 0, hasProject: !!project });
     }
     
-    // Reset the input so the same file can be selected again
-    event.target.value = '';
+    // Don't reset the input immediately to preserve the files
+    // event.target.value = '';
   };
 
   const handleScanProject = () => {
