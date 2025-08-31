@@ -24,10 +24,10 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
 
     // Try different supported models in order of preference
     const modelsToTry = [
-      "anthropic.claude-3-haiku-20240307-v1:0",
-      "anthropic.claude-instant-v1",
-      "anthropic.claude-v2:1",
-      "amazon.titan-text-express-v1"
+      "amazon.nova-lite-v1:0",
+      "anthropic.claude-3-7-sonnet-20250109-v1:0",
+      "amazon.nova-micro-v1:0",
+      "amazon.nova-pro-v1:0"
     ];
 
     for (const modelId of modelsToTry) {
@@ -40,6 +40,19 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
             anthropic_version: "bedrock-2023-05-31",
             max_tokens: 4000,
             messages: messages
+          });
+        } else if (modelId.startsWith("amazon.nova")) {
+          // Nova model format - similar to modern chat format
+          body = JSON.stringify({
+            messages: messages.map(msg => ({
+              role: msg.role === "user" ? "user" : "assistant",
+              content: [{ text: msg.content }]
+            })),
+            inferenceConfig: {
+              max_new_tokens: 4000,
+              temperature: 0.1,
+              top_p: 0.9
+            }
           });
         } else if (modelId.startsWith("amazon.titan")) {
           // Titan model format
@@ -66,6 +79,8 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
         
         if (modelId.startsWith("anthropic")) {
           return responseBody.content[0].text;
+        } else if (modelId.startsWith("amazon.nova")) {
+          return responseBody.output.message.content[0].text;
         } else if (modelId.startsWith("amazon.titan")) {
           return responseBody.results[0].outputText;
         }
