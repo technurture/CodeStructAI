@@ -24,8 +24,8 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
 
     // Try different supported models in order of preference
     const modelsToTry = [
-      "anthropic.claude-3-sonnet-20240229-v1:0",  // Standard Claude 3 Sonnet
-      "anthropic.claude-3-haiku-20240307-v1:0"    // Fallback to Haiku
+      "us.anthropic.claude-3-7-sonnet-20250219-v1:0",  // Claude 3.7 Sonnet with inference profile
+      "amazon.nova-lite-v1:0"                           // Nova Lite as fallback
     ];
 
     for (const modelId of modelsToTry) {
