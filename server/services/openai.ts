@@ -22,10 +22,12 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
       { role: "user", content: prompt }
     ];
 
-    // Try different supported models in order of preference
+    // Try different supported models in order of preference  
+    // Note: Newer Claude models require inference profiles, not direct model IDs
     const modelsToTry = [
-      "us.anthropic.claude-3-7-sonnet-20250219-v1:0",  // Claude 3.7 Sonnet with inference profile
-      "amazon.nova-lite-v1:0"                           // Nova Lite as fallback
+      "us.anthropic.claude-3-5-sonnet-20241022-v2:0", // Claude 3.5 Sonnet v2 (inference profile)
+      "anthropic.claude-3-sonnet-20240229-v1:0",      // Claude 3 Sonnet (direct model)
+      "anthropic.claude-3-haiku-20240307-v1:0"        // Claude 3 Haiku (direct model)
     ];
 
     for (const modelId of modelsToTry) {
