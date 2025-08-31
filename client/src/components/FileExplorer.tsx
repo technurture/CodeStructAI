@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiUpload } from "@/lib/queryClient";
 import { Search, Folder, FolderOpen, FileText, Upload, AlertCircle } from "lucide-react";
 
 interface FileExplorerProps {
@@ -63,7 +63,7 @@ export default function FileExplorer({
         formData.append("files", file);
       });
       
-      const response = await apiRequest("POST", `/api/projects/${project.id}/upload`, formData);
+      const response = await apiUpload("POST", `/api/projects/${project.id}/upload`, formData);
       return response.json();
     },
     onSuccess: () => {
