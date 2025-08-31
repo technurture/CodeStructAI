@@ -35,7 +35,7 @@ export default function CodeEditor({ selectedFile, onDiffGenerated }: CodeEditor
         original: data.original,
         improved: data.documented,
         changes: data.changes,
-        file: typedFile,
+        file: data.file,
       });
       toast({
         title: "Success",
@@ -62,7 +62,7 @@ export default function CodeEditor({ selectedFile, onDiffGenerated }: CodeEditor
         original: data.original,
         improved: data.improved,
         changes: data.changes,
-        file: typedFile,
+        file: data.file,
       });
       toast({
         title: "Success",
