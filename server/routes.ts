@@ -226,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fileData = files.map(file => ({
         path: file.path,
         content: file.content,
-        language: file.language || undefined,
+        language: file.language || 'text',
       }));
 
       // Run AI analysis
@@ -263,7 +263,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "File not found" });
       }
 
-      const documented = await generateDocumentation(file.content, file.path);
+      const documented = await generateDocumentation([{
+        path: file.path,
+        content: file.content,
+        language: file.language || 'text'
+      }]);
       
       res.json({
         original: file.content,
@@ -273,7 +277,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             type: "addition",
             description: "Added comprehensive documentation and comments",
           }
-        ]
+        ],
+        file: {
+          id: file.id,
+          path: file.path,
+          language: file.language
+        }
       });
     } catch (error) {
       console.error("Documentation error:", error);
@@ -289,12 +298,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "File not found" });
       }
 
-      const improvements = await suggestCodeImprovements(file.content, file.path);
+      const improvements = await suggestCodeImprovements([{
+        path: file.path,
+        content: file.content,
+        language: file.language || 'text'
+      }]);
       
       res.json({
         original: file.content,
-        improved: improvements.improved,
-        changes: improvements.changes,
+        improved: improvements,
+        changes: [
+          {
+            type: "improvement",
+            description: "Applied AI-suggested code improvements",
+          }
+        ],
+        file: {
+          id: file.id,
+          path: file.path,
+          language: file.language
+        }
       });
     } catch (error) {
       console.error("Improvement error:", error);
@@ -327,7 +350,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const params = {
         email,
         amount: amount * 100, // Convert to kobo (Paystack's smallest unit)
-        currency: 'NGN'
+        currency: 'NGN',
+        reference: `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: email.split('@')[0]
       };
       
       const response = await paystack.transaction.initialize(params);
@@ -515,7 +540,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { content, fileName } = req.body;
-      const analysis = await analyzeCodebase([{ path: fileName, content, language: detectLanguage(fileName) }]);
+      const analysis = await analyzeCodebase([{ path: fileName, content, language: detectLanguage(fileName) || 'text' }]);
       
       res.json(analysis);
     } catch (error: any) {
@@ -531,7 +556,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { content, fileName } = req.body;
-      const documented = await generateDocumentation(content, fileName);
+      const documented = await generateDocumentation([{
+        path: fileName,
+        content,
+        language: detectLanguage(fileName) || 'text'
+      }]);
       
       res.json({ documented });
     } catch (error: any) {
@@ -547,7 +576,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { content, fileName } = req.body;
-      const improvements = await suggestCodeImprovements(content, fileName);
+      const improvements = await suggestCodeImprovements([{
+        path: fileName,
+        content,
+        language: detectLanguage(fileName) || 'text'
+      }]);
       
       res.json(improvements);
     } catch (error: any) {
