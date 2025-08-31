@@ -1,4 +1,5 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
+import OpenAI from "openai";
 
 const bedrock = new BedrockRuntimeClient({
   region: process.env.AWS_REGION || "us-east-1",
@@ -8,28 +9,73 @@ const bedrock = new BedrockRuntimeClient({
   },
 });
 
-// Helper function to invoke Bedrock models
-async function invokeBedrock(prompt: string, systemPrompt?: string): Promise<string> {
+// Initialize OpenAI client as fallback
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "",
+});
+
+// Helper function to invoke AWS Bedrock
+async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> {
   try {
     const messages = [
       ...(systemPrompt ? [{ role: "user", content: systemPrompt }] : []),
       { role: "user", content: prompt }
     ];
 
-    const command = new InvokeModelCommand({
-      modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0", // Using Claude 3.5 Sonnet via Bedrock
-      contentType: "application/json",
-      accept: "application/json",
-      body: JSON.stringify({
-        anthropic_version: "bedrock-2023-05-31",
-        max_tokens: 4000,
-        messages: messages
-      })
-    });
+    // Try different supported models in order of preference
+    const modelsToTry = [
+      "anthropic.claude-3-haiku-20240307-v1:0",
+      "anthropic.claude-instant-v1",
+      "anthropic.claude-v2:1",
+      "amazon.titan-text-express-v1"
+    ];
 
-    const response = await bedrock.send(command);
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-    return responseBody.content[0].text;
+    for (const modelId of modelsToTry) {
+      try {
+        console.log(`Trying model: ${modelId}`);
+        
+        let body;
+        if (modelId.startsWith("anthropic")) {
+          body = JSON.stringify({
+            anthropic_version: "bedrock-2023-05-31",
+            max_tokens: 4000,
+            messages: messages
+          });
+        } else if (modelId.startsWith("amazon.titan")) {
+          // Titan model format
+          const combinedPrompt = (systemPrompt ? systemPrompt + "\n\n" : "") + prompt;
+          body = JSON.stringify({
+            inputText: combinedPrompt,
+            textGenerationConfig: {
+              maxTokenCount: 4000,
+              temperature: 0.1,
+              topP: 0.9
+            }
+          });
+        }
+
+        const command = new InvokeModelCommand({
+          modelId: modelId,
+          contentType: "application/json",
+          accept: "application/json",
+          body: body
+        });
+
+        const response = await bedrock.send(command);
+        const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+        
+        if (modelId.startsWith("anthropic")) {
+          return responseBody.content[0].text;
+        } else if (modelId.startsWith("amazon.titan")) {
+          return responseBody.results[0].outputText;
+        }
+      } catch (modelError) {
+        console.log(`Model ${modelId} failed:`, (modelError as Error).message);
+        continue; // Try next model
+      }
+    }
+    
+    throw new Error("All Bedrock models failed");
   } catch (error) {
     console.error('AWS Bedrock error:', error);
     throw new Error('Failed to invoke AWS Bedrock: ' + (error as Error).message);
@@ -100,7 +146,7 @@ Focus on:
 5. Best practices violations`;
 
     const systemPrompt = "You are an expert code analyst. Analyze codebases and provide structured feedback on architecture, issues, and improvements. Always respond with valid JSON.";
-    const result = await invokeBedrock(prompt, systemPrompt);
+    const result = await invokeAI(prompt, systemPrompt);
     return JSON.parse(result) as CodeAnalysisResult;
   } catch (error) {
     console.error('AWS Bedrock analysis error:', error);
@@ -125,7 +171,7 @@ Add:
 Return only the enhanced code with documentation added.`;
 
     const systemPrompt = "You are a documentation expert. Add comprehensive documentation to code files while preserving all original functionality.";
-    const result = await invokeBedrock(prompt, systemPrompt);
+    const result = await invokeAI(prompt, systemPrompt);
     return result || code;
   } catch (error) {
     console.error('Documentation generation error:', error);
@@ -170,7 +216,7 @@ Focus on:
 5. Best practices`;
 
     const systemPrompt = "You are a code improvement expert. Enhance code quality while maintaining functionality. Always respond with valid JSON.";
-    const result = await invokeBedrock(prompt, systemPrompt);
+    const result = await invokeAI(prompt, systemPrompt);
     return JSON.parse(result);
   } catch (error) {
     console.error('Code improvement error:', error);
