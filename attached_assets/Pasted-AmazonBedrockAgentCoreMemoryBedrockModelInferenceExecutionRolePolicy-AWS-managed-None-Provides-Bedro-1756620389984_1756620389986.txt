@@ -1,0 +1,70 @@
+AmazonBedrockAgentCoreMemoryBedrockModelInferenceExecutionRolePolicy
+AWS managed
+None
+Provides Bedrock Model inference permission to Bedrock agent core memory
+AmazonBedrockFullAccess
+AWS managed
+Permissions policy (1)
+Provides full access to Amazon Bedrock as well as limited access to related services that are required by it
+AmazonBedrockLimitedAccess
+AWS managed
+None
+Provides limited access to Amazon Bedrock as well as to related services that are required by it
+AmazonBedrockMarketplaceAccess
+AWS managed
+None
+Provides limited access to Amazon Bedrock Marketplace as well as to related services that are required by it
+AmazonBedrockReadOnly
+AWS managed
+None
+Provides read only access to Amazon Bedrock
+AmazonBedrockStudioPermissionsBoundary
+AWS managed
+None
+Defines the maximum permissions of IAM roles that Amazon Bedrock Studio creates for operating Amazon Bedrock Studio resources.
+AmazonDataZoneBedrockModelConsumptionPolicy
+AWS managed
+None
+Provides permissions to consume Amazon Bedrock models, including invoking Amazon Bedrock application inference profile created for particular Amazon DataZone domain.
+AmazonDataZoneBedrockModelManagementPolicy
+AWS managed
+None
+Provides permissions to manage Amazon Bedrock model access, including creating, tagging and deleting application inference profiles.
+AmazonSageMakerCanvasBedrockAccess
+AWS managed
+None
+This policy grants permissions to use Amazon Bedrock in SageMaker Canvas by providing access to downstream services such as S3.
+BedrockAgentCoreFullAccess
+AWS managed
+None
+Provides full access to Bedrock AgentCore as well as limited access to related services
+SageMakerStudioBedrockAgentServiceRolePolicy
+AWS managed
+None
+Allows Amazon Bedrock Agents to access Amazon Bedrock models and other resources attached to an agent in SageMaker Studio.
+SageMakerStudioBedrockChatAgentUserRolePolicy
+AWS managed
+None
+Provides access to an Amazon Bedrock chat agent app's configuration and Amazon Bedrock agent in SageMaker Studio.
+SageMakerStudioBedrockEvaluationJobServiceRolePolicy
+AWS managed
+None
+Allows Amazon Bedrock to access Amazon Bedrock models and datasets for evaluation jobs in SageMaker Studio.
+SageMakerStudioBedrockFlowServiceRolePolicy
+AWS managed
+None
+Allows Amazon Bedrock Flows to access Amazon Bedrock models and other resources attached to a flow in SageMaker Studio.
+SageMakerStudioBedrockFunctionExecutionRolePolicy
+AWS managed
+None
+Allows AWS Lambda to access an Amazon Bedrock function component's configuration in SageMaker Studio.
+SageMakerStudioBedrockKnowledgeBaseCustomResourcePolicy
+AWS managed
+None
+Provides access to configure vector stores and Amazon Bedrock knowledge bases in SageMaker Studio.
+SageMakerStudioBedrockKnowledgeBaseServiceRolePolicy
+AWS managed
+None
+Allows Amazon Bedrock Knowledge Bases to access Amazon Bedrock models and data sources in SageMaker Studio.
+SageMakerStudioBedrockPromptUserRolePolicy
+AWS managed
