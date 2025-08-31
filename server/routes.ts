@@ -196,12 +196,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get specific file
   app.get("/api/files/:id", async (req, res) => {
     try {
+      console.log('File request for ID:', req.params.id);
       const file = await storage.getProjectFile(req.params.id);
+      console.log('File found:', file ? 'YES' : 'NO');
       if (!file) {
         return res.status(404).json({ message: "File not found" });
       }
       res.json(file);
     } catch (error) {
+      console.error('File fetch error:', error);
       res.status(500).json({ message: "Failed to get file" });
     }
   });

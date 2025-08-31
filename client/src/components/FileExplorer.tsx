@@ -202,7 +202,11 @@ export default function FileExplorer({
             className={`tree-item p-2 rounded cursor-pointer flex items-center text-sm transition-colors ${
               isSelected ? 'bg-muted/30' : 'hover:bg-muted/20'
             }`}
-            onClick={() => onFileSelect(node.data.id)}
+            onClick={() => {
+              console.log('File clicked:', name, 'with ID:', node.data.id);
+              console.log('Full file data:', node.data);
+              onFileSelect(node.data.id);
+            }}
             data-testid={`file-${node.data.id}`}
           >
             <FileText className="w-4 h-4 mr-2 text-blue-400" />
