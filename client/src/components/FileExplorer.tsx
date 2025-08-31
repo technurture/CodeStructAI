@@ -32,6 +32,11 @@ export default function FileExplorer({
   });
 
   const typedFiles = Array.isArray(files) ? files : [];
+  
+  // Debug logging for files
+  console.log("Files query result:", files);
+  console.log("Typed files:", typedFiles);
+  console.log("Project ID:", project?.id);
 
   const createProjectMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -263,6 +268,7 @@ export default function FileExplorer({
               <input
                 type="file"
                 multiple
+                accept=".js,.jsx,.ts,.tsx,.py,.java,.cpp,.c,.cs,.go,.php,.rb,.rs,.kt,.swift,.html,.css,.scss,.sass,.json,.xml,.yml,.yaml"
                 onChange={handleFileUpload}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 data-testid="input-file-upload"
@@ -274,7 +280,7 @@ export default function FileExplorer({
                 data-testid="button-upload-files"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Upload Files
+                {uploadFilesMutation.isPending ? "Uploading..." : "Upload Files"}
               </Button>
             </div>
             
