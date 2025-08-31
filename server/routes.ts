@@ -462,12 +462,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const now = new Date();
-      const trialExpired = user.subscriptionExpires ? now > user.subscriptionExpires : true;
+      const trialExpired = user.trialEndsAt ? now > user.trialEndsAt : true;
       
       res.json({
         status: user.subscriptionTier,
         trialExpired: trialExpired && user.subscriptionTier === 'trial',
-        trialEndsAt: user.subscriptionExpires
+        trialEndsAt: user.trialEndsAt
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -488,7 +488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check subscription status
       const now = new Date();
-      const trialExpired = user.subscriptionExpires ? now > user.subscriptionExpires : true;
+      const trialExpired = user.trialEndsAt ? now > user.trialEndsAt : true;
       if (trialExpired && user.subscriptionTier === 'trial') {
         return res.status(403).json({ message: "Trial expired. Please upgrade to Pro." });
       }

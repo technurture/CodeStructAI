@@ -46,6 +46,7 @@
     "@stripe/stripe-js": "^7.9.0",
     "@tanstack/react-query": "^5.60.5",
     "@types/multer": "^2.0.0",
+    "@types/paystack": "^2.0.4",
     "@types/vscode": "^1.103.0",
     "@vscode/vsce": "^3.6.0",
     "class-variance-authority": "^0.7.1",
