@@ -22,15 +22,9 @@ async function invokeAI(prompt: string, systemPrompt?: string): Promise<string> 
       { role: "user", content: prompt }
     ];
 
-    // Try different supported models in order of preference  
-    // PRIORITY: Nova Lite first (user confirmed access)
+    // CRITICAL: Try Nova Lite FIRST - user has confirmed access
     const modelsToTry = [
-      "amazon.nova-lite-v1:0",                         // Nova Lite (confirmed access)
-      "us.anthropic.claude-3-7-sonnet-20250219-v1:0", // Claude 3.7 Sonnet (inference profile)
-      "anthropic.claude-3-7-sonnet-20250219-v1:0",    // Claude 3.7 Sonnet (direct model)
-      "us.anthropic.claude-3-5-sonnet-20241022-v2:0", // Claude 3.5 Sonnet v2 (inference profile)
-      "anthropic.claude-3-sonnet-20240229-v1:0",      // Claude 3 Sonnet (direct model)
-      "anthropic.claude-3-haiku-20240307-v1:0"        // Claude 3 Haiku (direct model)
+      "amazon.nova-lite-v1:0"  // Nova Lite (confirmed access) - ONLY TRY THIS ONE
     ];
 
     for (const modelId of modelsToTry) {
